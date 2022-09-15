@@ -17,16 +17,30 @@ You are about to learn:
 ## Quick Start
 
 1. Clone the repo:  
-   ```git clone git@github.com:marcopeg/traefik-docker-multi-project.git```
+   `git clone git@github.com:marcopeg/traefik-docker-multi-project.git`
+2. Open the project:  
+   `cd traefik-docker-multi-project`
 2. Start it:  
-   ```make start```
+   `make start`
 3. Test it on your browser:
   - http://app.p1.localhost
   - http://app.p2.localhost
   - http://traefik.localhost
 
+> **NOTE:** You need [Docker-Compose][dc] running on your laptop, and port `80` to be available.
+
+> 😫 In case you are **working on a Windows machine** (I feel sorry for you) and can't enjoy [Make][make], try one of the following steps:
+> 
+> - Use [git bash](https://www.atlassian.com/git/tutorials/> git-bash) to execute the commands
+> - Run it under [WSL2](https://docs.microsoft.com/en-us/windows/wsl/install)
+> - Read the Docker-Compose command from the `Makefile` and execute it yourself from each project's terminal session
+
+## Projects Structure
+
+This
 
 [traefik]: https://traefik.io/
 [dc]: https://docs.docker.com/compose/
 [docker]: https://www.docker.com/get-started/
 [nginx]: https://www.nginx.com/
+[make]: https://www.gnu.org/software/make/
