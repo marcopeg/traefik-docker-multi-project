@@ -8,5 +8,5 @@ services:
 
 networks:
   default:
-    name: OneFront
     external: true
+    name: traefik

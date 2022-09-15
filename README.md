@@ -16,6 +16,8 @@ You are about to learn:
 - [Project Structure](#projects-structure)
 - [Run a Static Website on NGiNX](#run-a-static-website-on-nginx)
 - [Forget the Ports, Let's use Labels Instead!](#forget-the-ports-lets-use-labels-instead)
+- [Customize the Docker Network](#customize-the-docker-network)
+- [Using Default Networks](#using-default-networks)
 
 ## Quick Start
 
@@ -23,9 +25,9 @@ You are about to learn:
    `git clone git@github.com:marcopeg/traefik-docker-multi-project.git`
 2. Open the project:  
    `cd traefik-docker-multi-project`
-2. Start it:  
+3. Start it:  
    `make start`
-3. Test it on your browser:
+4. Test it on your browser:
   - http://app.project1.localhost
   - http://app.project2.localhost
   - http://traefik.localhost
@@ -133,7 +135,83 @@ In this label, we use `app_p1` as router's name:
 It is the combination of:  
 `{container-name}_{project-name}`
 
-😬 Most of the troubles I ran into while researching for this tutorial was about naming conflicts!
+> 😬 Most of the troubles I ran into while researching for this tutorial was about naming conflicts!
+
+**IMPORTANT:** If you run your project now, it will work. But it **is not going to be visibile** from the browser as you removed the `ports` definition.
+
+👉 The `labels` alone won't do much until you run the Traefik proxy!
+
+## Run Traefik Proxy
+
+The `/proxy/docker-compose.yml` is practically a copy/paste from the [Run CRA with Traefik][tutorial1] tutorial.
+
+🙏 Please refer to that [documentation](https://github.com/marcopeg/cra-docker-traefik#add-the-reverse-proxy) 🙏
+
+## Customize the Docker Network
+
+We finally reach the interesting part of this tutorial: networking.
+
+[Docker Networking](https://docs.docker.com/network/) is a rather complicated subject, expecially if you plan to use Docker in production.
+
+Lukily for me, the scope of this tutorial is to use Docker to **improve your Development Experience**, and your local environment. So I'll keep it rather simple 😇.
+
+When you run a Docker-Compose project, **Docker automagically creates a network that is private to such project**. Docker uses the project's folder name as network name.
+
+Do far, our 3 projects run in 3 independent networks, therefore the containers are invisible to one another with the following consequences:
+
+1. You can not make direct calls between containers
+2. Traefik can't read labels from containers in different networks
+
+Although we don't really use container-to-container calls in this tutorial, we do want point n.2 to work!
+
+The solution is a 2 steps process:
+
+1. Give an explicit configuration to Traefik's network
+2. Tell our projects to use Traefik's network instead of creating their own
+
+Open the `proxy/docker-compose.yml` and add the network configuration:
+
+```yml
+# Set a custom name for the Traefik's project network:
+networks:
+  default:
+    name: traefik
+```
+
+Then do the same with the two projects, but use this time use the following code:
+
+```yml
+# Configure the project to use an external network:
+networks:
+  default:
+    external: true
+    name: traefik
+```
+
+Run the project (`make start`), and voilá 🎉!
+
+## Using Default Networks
+
+There is a way to use an even easier configuration.
+
+You could try to remove the network configuration from the Traefik project, then change the project's config to:
+
+```yml
+# Configure the project to use an external network:
+networks:
+  default:
+    external: true
+    name: traefik_default
+```
+
+The network name `traefik_default` comes from `{project-name}_{network_name}`:
+
+- Docker uses the folder's name as `project-name`
+- Docker created a default network unless different configuration is given, and it calls it `default`
+
+🔥 Although you could have saved a few lines of YML with this approach, I strongly vouch against it because you are never in control of folder's names when you distribute a project to a large team.
+
+> Git repositories can be cloned into any folder name, and just this little detail can cause great headaches!
 
 [tutorial1]: https://github.com/marcopeg/cra-docker-traefik#readme
 [traefik]: https://traefik.io/
