@@ -6,7 +6,7 @@ services:
       - ./html:/usr/share/nginx/html/:ro
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app_p1.rule=Host(`app.p1.localhost`)"
+      - "traefik.http.routers.app_project1.rule=Host(`app.project1.localhost`)"
 
 networks:
   default:

@@ -8,13 +8,14 @@ You are about to learn:
 - How to setup a _custom newtwork_ in Docker
 - How to attach containers to an existing _Docker network_
 
-👉 Before you continue, make sure you go through the "[How to run a _Create React App_ development environment using Docker, Docker-Compose, and Traefik](https://github.com/marcopeg/cra-docker-traefik#readme)" tutorial, for it covers the basics of setting up Traefik and we won't repeat it in here.
+👉 Before you continue, make sure you go through the "[How to run a _Create React App_ development environment using Docker, Docker-Compose, and Traefik][tutorial1]" tutorial, for it covers the basics of setting up Traefik and we won't repeat it in here.
 
 ## Table Of Contents
 
 - [Quick Start](#quick-start)
 - [Project Structure](#projects-structure)
 - [Run a Static Website on NGiNX](#run-a-static-website-on-nginx)
+- [Forget the Ports, Let's use Labels Instead!](#forget-the-ports-lets-use-labels-instead)
 
 ## Quick Start
 
@@ -25,8 +26,8 @@ You are about to learn:
 2. Start it:  
    `make start`
 3. Test it on your browser:
-  - http://app.p1.localhost
-  - http://app.p2.localhost
+  - http://app.project1.localhost
+  - http://app.project2.localhost
   - http://traefik.localhost
 
 > **NOTE:** You need [Docker-Compose][dc] running on your laptop, and port `80` to be available.
@@ -107,6 +108,34 @@ services:
       - "8080:80"
 ```
 
+## Forget the Ports, Let's use Labels Instead!
+
+Following the same predicaments of the [Run CRA with Traefik][tutorial1] tutorial, you can remove the `ports` definition from your `docker-compose.yml` and use `labels` to configure a proxy via [Traefik][traefik] instead:
+
+```yml
+# /project1/docker-compose.yml
+version: "3.8"
+services:
+  app:
+    image: nginx
+    volumes:
+      - ./html:/usr/share/nginx/html/:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app_project1.rule=Host(`app.project1.localhost`)"
+```
+
+> 🔥 When it comes to this configuration, you must be careful in providing **names that will be unique** across the entire set of projects that you want to expose via Traefik.
+
+In this label, we use `app_p1` as router's name:  
+`traefik.http.routers.app_p1.rule`
+
+It is the combination of:  
+`{container-name}_{project-name}`
+
+😬 Most of the troubles I ran into while researching for this tutorial was about naming conflicts!
+
+[tutorial1]: https://github.com/marcopeg/cra-docker-traefik#readme
 [traefik]: https://traefik.io/
 [dc]: https://docs.docker.com/compose/
 [docker]: https://www.docker.com/get-started/

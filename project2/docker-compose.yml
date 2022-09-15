@@ -4,7 +4,7 @@ services:
     build: .
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.app_p2.rule=Host(`app.p2.localhost`)"
+      - "traefik.http.routers.app_project2.rule=Host(`app.project2.localhost`)"
 
 networks:
   default:
