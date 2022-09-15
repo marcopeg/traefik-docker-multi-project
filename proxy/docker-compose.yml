@@ -1,0 +1,29 @@
+version: "3.8"
+services:
+  traefik:
+    image: "traefik:v2.8"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - onefront
+    healthcheck:
+      test: ["CMD", "wget", "-qO", "-", "http://traefik:8080/dashboard/"]
+      interval: 2s
+      timeout: 1s
+      retries: 20
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.traefik.rule=Host(`traefik.localhost`)"
+      - "traefik.http.services.traefik.loadbalancer.server.port=8080"
+
+networks:
+  onefront:
+    name: OneFront
+    driver: bridge

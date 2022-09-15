@@ -1,0 +1,14 @@
+version: "3.8"
+services:
+  app:
+    image: nginx
+    volumes:
+      - ./html:/usr/share/nginx/html/:ro
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app_p1.rule=Host(`app.p1.localhost`)"
+
+networks:
+  default:
+    name: OneFront
+    external: true
