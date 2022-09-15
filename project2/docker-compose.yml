@@ -1,9 +1,7 @@
 version: "3.8"
 services:
   app:
-    image: nginx
-    volumes:
-      - ./html:/usr/share/nginx/html/:ro
+    build: .
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.app_p2.rule=Host(`app.p2.localhost`)"
